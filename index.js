@@ -54,11 +54,12 @@ function parse(fp) {
     const cve = advisory.cves && advisory.cves.length
       ? advisory.cves[0]
       : null
+    const sev = getPriority(severity)
 
     for (const finding of findings) {
       const paths = finding.paths.map((path) => {
         return path.replace(/\>/g, ' > ')
-      }).join('\n')
+      }).join(', ')
 
       const identifiers = []
       for (const cve of advisory.cves) {
@@ -78,11 +79,12 @@ function parse(fp) {
           id: 'npm-audit'
         , name: 'npm'
         }
-      , cve: cve ? `package-lock.json:${module_name}:${cve}` : null
+      , cve
       , cwe: advisory.cwe
       , solution: recommendation
       , links: [{ url }]
-      , priority: getPriority(severity)
+      , severity: sev
+      , priority: sev
       , identifiers
       , location: {
           file: 'package-lock.json'

@@ -1,6 +1,6 @@
 {
   "name": "scan-deps-gitlab",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "description": "Create GitLab compatible dependency scanning report from npm audit",
   "main": "index.js",
   "bin": {

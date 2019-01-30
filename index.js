@@ -42,22 +42,66 @@ function parse(fp) {
   const advisories = Object.values(audit.advisories)
 
   for (const advisory of advisories) {
-    const {title, overview, recommendation, severity, url} = advisory
-    const message = `${title}\n\n${overview}`
+    const {
+      title
+    , overview
+    , recommendation
+    , severity
+    , url
+    , module_name
+    , findings
+    } = advisory
     const cve = advisory.cves && advisory.cves.length
       ? advisory.cves[0]
       : null
-    result.push({
-      message
-    , cve
-    , cwe: advisory.cwe
-    , solution: recommendation
-    , url
-    , priority: getPriority(severity)
-    })
+
+    for (const finding of findings) {
+      const paths = finding.paths.map((path) => {
+        return path.replace(/\>/g, ' > ')
+      }).join('\n')
+
+      const identifiers = []
+      for (const cve of advisory.cves) {
+        identifiers.push({
+          type: 'cve'
+        , name: cve
+        , value: cve
+        , url: `https://cve.mitre.org/cgi-bin/cvename.cgi?name=${cve}`
+        })
+      }
+      result.push({
+        description: `${overview}\n\nFound in:\n\n${paths}`
+      , message: `${title} in ${module_name}`
+      , category: 'dependency_scanning'
+      , name: title
+      , scanner: {
+          id: 'npm-audit'
+        , name: 'npm'
+        }
+      , cve: cve ? `package-lock.json:${module_name}:${cve}` : null
+      , cwe: advisory.cwe
+      , solution: recommendation
+      , links: [{ url }]
+      , priority: getPriority(severity)
+      , identifiers
+      , location: {
+          file: 'package-lock.json'
+        , dependency: {
+            package: {
+              name: module_name
+            }
+          , version: finding.version
+          }
+        }
+      })
+    }
   }
   const filename = 'gl-dependency-scanning-report.json'
-  fs.writeFileSync(filename, JSON.stringify(result), 'utf8')
+  const out = {
+    version: '2.0'
+  , vulnerabilities: result
+  }
+  fs.writeFileSync(filename, JSON.stringify(out, null, 2), 'utf8')
 }
 
 if (require.main === module) {

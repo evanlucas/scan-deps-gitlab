@@ -1,0 +1,19 @@
+{
+  "name": "scan-deps-gitlab",
+  "version": "0.1.0",
+  "description": "Create GitLab compatible dependency scanning report from npm audit",
+  "main": "index.js",
+  "bin": {
+    "scan-deps-gitlab": "index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Evan Lucas <evanlucas@me.com> (https://evanlucas.com)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/evanlucas/scan-deps-gitlab"
+  }
+}
